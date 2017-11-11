@@ -9,7 +9,7 @@ using System.Web.UI.WebControls;
 
 public partial class ChangePwd : System.Web.UI.Page
 {
-    static Class1 us = new Class1();
+    static SQLHelper us = new SQLHelper();
     protected void Page_Load(object sender, EventArgs e)
     {
         
@@ -25,7 +25,6 @@ public partial class ChangePwd : System.Web.UI.Page
         int lenPwd = pwd.Length;
         int lenPwd_O = pwd_O.Length;
         int lenPwd_R = pwd_R.Length;
-        //SELECT * FROM users WHERE username=N'+username+' and password='+password+'
         if (lenName == 0)
             Response.Write("<script>alert('用户名不能为空！')</script>");
         else if (lenPwd < 6 && lenPwd > 12)
@@ -36,7 +35,9 @@ public partial class ChangePwd : System.Web.UI.Page
             Response.Write("<script>alert('确认密码必须为6到12位的数字或字母！')</script>");
         else
         {
-            int count = us.CheckPwd(username, pwd);
+            string sql = "SELECT * FROM users WHERE username=N'" + username + "' AND password='" + pwd + "'";
+            DataTable dt = us.SQL_dt(sql);
+            int count = dt.Rows.Count;
             if (count == 0)
                 Response.Write("<script>alert('用户名或密码错误！')</script>");
             else
@@ -45,8 +46,9 @@ public partial class ChangePwd : System.Web.UI.Page
                     Response.Write("<script>alert('输入密码和确认密码不一致！')</script>");
                 else
                 {
-                    us.UpdateUser(username, pwd_O);
-                    Response.Write("<script>alert('修改成功！');location='Main.aspx'</script>");
+                    sql = "UPDATE users SET password='" + pwd_O + "' WHERE username=N'" + username + "'";
+                    us.SQL(sql);
+                    Response.Write("<script>alert('修改成功！');location='Login.aspx'</script>");
                 }
             }
         }
@@ -54,6 +56,6 @@ public partial class ChangePwd : System.Web.UI.Page
 
     protected void btnBack_Click(object sender, EventArgs e)  //返回修改密码页面到主页面
     {
-        Response.Redirect("Main.aspx");
+        Response.Redirect("Login.aspx");
     }
 }
